@@ -5,11 +5,11 @@ import math
 import pandas as pd
 
 # ====== 入力ファイル（添付に合わせて固定）======
-VIDEO_PATH = r"/home/kota/ドキュメント/data_creator/cap-2025-08-27-08-37-02.mp4"
-CSV_PATH   = r"/home/kota/ドキュメント/data_creator/xy_log_2025-08-27_083636.csv"
+VIDEO_PATH = r"/home/kota/ドキュメント/GitHub/data_creator/cap-2025-08-27-08-37-02.mp4"
+CSV_PATH   = r"/home/kota/ドキュメント/GitHub/data_creator/xy_log_2025-08-27_083636.csv"
 
 # ====== 出力先 ======
-OUT_DIR = r"/home/kota/ドキュメント/data_creator"  # なければ作ります
+OUT_DIR = r"/home/kota/ドキュメント/GitHub/data_creator"  # なければ作ります
 EXT = ".png"                  # 保存拡張子（.png 推奨）
 
 # ====== 切り出し間隔（秒）======
@@ -61,17 +61,41 @@ def create_folders():
     # 出力基準ディレクトリを作成
     os.makedirs(OUT_DIR, exist_ok=True)
 
-    # CSVを読み込む（中身は今回使わないが存在確認のため）
-    df = pd.read_csv(CSV_PATH)
+    df = pd.read_csv(CSV_PATH, skiprows = 1, header=None)
+    print(df)
+    print(len(df))
 
     # マッピングに基づいてフォルダ作成
     for row_num, folder_name in mapping.items():
-        if 1 <= row_num <= len(df):
-            path = os.path.join(OUT_DIR, folder_name)
-            os.makedirs(path, exist_ok=True)
-            print(f"✅ 作成しました: {path}")
-        else:
-            print(f"⚠ 行 {row_num} はCSVに存在しません。スキップしました。")
+        print(folder_name)
+        for row in df.itertuples(index=False):
+            x, y, z, z_quat, w_quat = row[0], row[1], row[2], row[5], row[6]
+            x, y, z, z_quat, w_quat = str(x), str(y), str(z), str(z_quat), str(w_quat)
+            #print(x, y, z, z_quat, w_quat)
+            if 1 <= row_num <= len(df):
+                if folder_name == "x":
+                    path = os.path.join(OUT_DIR + '/' + folder_name + '/', x)
+                    os.makedirs(path, exist_ok=True)
+                    print(f"✅ 作成しました: {path}")
+                elif folder_name == "y":
+                    path = os.path.join(OUT_DIR + '/' + folder_name + '/', y)
+                    os.makedirs(path, exist_ok=True)
+                    print(f"✅ 作成しました: {path}")
+                elif folder_name == "z":
+                    path = os.path.join(OUT_DIR + '/' + folder_name + '/', z)
+                    os.makedirs(path, exist_ok=True)
+                    print(f"✅ 作成しました: {path}")
+                elif folder_name == "z_quat":
+                    path = os.path.join(OUT_DIR + '/' + folder_name + '/', z_quat)
+                    os.makedirs(path, exist_ok=True)
+                    print(f"✅ 作成しました: {path}")
+                else:
+                    path = os.path.join(OUT_DIR + '/' + folder_name + '/', w_quat)
+                    os.makedirs(path, exist_ok=True)
+                    print(f"✅ 作成しました: {path}")
+                
+            else:
+                print(f"⚠ 行 {row_num} はCSVに存在しません。スキップしました。")
 
 def sanitize_filename(s: str, maxlen: int = 200) -> str:
     """
